@@ -1,3 +1,4 @@
+#include "x_nucleo_nfc04.h"
 #include <Wire.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
@@ -21,7 +22,7 @@ void logClr() {
     Wire.write(byte(0x00));
   }
   Wire.endTransmission();
-  delay(200);
+  delay(200); // 5.5ms * 128/4 
 }
 
 void logMsg(char *msg) {
@@ -31,7 +32,24 @@ void logMsg(char *msg) {
   Wire.write(msg);
   Wire.endTransmission();
   logs += 16;  
-  delay(25);
+  delay(25);  // 5.5ms * 16/4
+}
+
+void writeMsg(uint8_t *msg, uint16_t len) {
+  Wire.beginTransmission(nfcprom);
+  Wire.write(byte(0x00)); // high address byte
+  Wire.write(byte(0x00)); // low address byte
+  Wire.write(byte(0xE1));
+  Wire.write(byte(0x40));
+  Wire.write(byte(0x40));
+  Wire.write(byte(0x00));
+  Wire.write(byte(0x03));
+  Wire.write(byte(len));
+  Wire.write(msg, len);
+  Wire.write(byte(0xFE)); // Terminator TLV
+  Wire.write(byte(0xFF));  
+  Wire.endTransmission();
+  delay(2*len);  // 5.5ms/4 * len
 }
 
 void handleRoot() {
@@ -57,10 +75,12 @@ void handleNotFound() {
 }
 
 void setup(void) {
+  int ret = 0;
   Wire.begin();
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
+
   Serial.println("");
   logClr();
 
@@ -115,6 +135,17 @@ void setup(void) {
   logMsg(msgBuf);
   String("Trys: " + String(trys)).toCharArray(msgBuf, 16);
   logMsg(msgBuf);
+
+  if(ret != NDEF_OK)
+    Serial.println("Error initializing NFCTAG");
+  sURI_Info myURI;
+  strcpy( myURI.protocol,URI_ID_0x03_STRING );
+  strcpy( myURI.URI_Message,IPString.c_str() );
+  strcpy( myURI.Information,"" );
+  uint8_t ndefBuf[192];
+  uint16_t ndefSize=0;
+  NDEF_PrepareURIMessage(&myURI, ndefBuf, &ndefSize);
+  writeMsg(ndefBuf, ndefSize);
 
   if (MDNS.begin("esp32")) {
     Serial.println("MDNS responder started");
