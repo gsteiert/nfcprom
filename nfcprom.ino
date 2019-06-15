@@ -5,8 +5,6 @@
 #include <WebServer.h>
 #include <ESPmDNS.h>
 
-//const char* ssid = "QwiiKit";
-//const char* password = "";
 int logs = 0;
 
 WebServer server(80);
@@ -54,8 +52,7 @@ void writeMsg(uint8_t *msg, uint16_t len) {
 
 void handleRoot() {
   digitalWrite(led, 1);
-  server.send(200, "text/plain", "hello from esp8266!");
-  digitalWrite(led, 0);
+  server.send(200, "text/html", "<html><body><h1>Qwiic NFCPROM</h1>Led ON, <p><a href=\"/led/off\">turn off</a></body></html>");
 }
 
 void handleNotFound() {
@@ -153,18 +150,14 @@ void setup(void) {
 
   server.on("/", handleRoot);
 
-  server.on("/inline", []() {
-    server.send(200, "text/plain", "this works as well");
-  });
-
   server.on("/led/on", []() {
     digitalWrite(led, 1);
-    server.send(200, "text/html", "<html><body>Led ON, <p><a href=\"/led/off\">turn off</a></body></html>");
+    server.send(200, "text/html", "<html><body><h1>Qwiic NFCPROM</h1>Led ON, <p><a href=\"/led/off\">turn off</a></body></html>");
   });
 
   server.on("/led/off", []() {
     digitalWrite(led, 0);
-    server.send(200, "text/html", "<html><body>Led OFF, <p><a href=\"/led/on\">turn on</a></body></html>");
+    server.send(200, "text/html", "<html><body><h1>Qwiic NFCPROM</h1>Led OFF, <p><a href=\"/led/on\">turn on</a></body></html>");
   });
 
   server.onNotFound(handleNotFound);
