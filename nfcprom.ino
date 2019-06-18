@@ -102,7 +102,7 @@ void setup(void) {
   Wire.requestFrom(nfcprom, 32);
   Serial.print("PWD:  ");
   while(Wire.available()) {
-    ssid += (char)Wire.read();
+    password += (char)Wire.read();
   }
   Serial.println(password);
 
