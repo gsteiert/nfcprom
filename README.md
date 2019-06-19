@@ -1,5 +1,5 @@
 # nfcprom
-NFC EEPROM Example for boards based on the ST25DV series of dual port NFC/I2C EEPROM, like the Qwiic NFCPROM, Blinking Business-card Badge, or Teardown2019 Badge.  This example demonstrates how to manage a headless embedded WiFi web server with a phone through NFC. 
+NFC EEPROM Example for boards based on the ST25DV series of dual port NFC/I2C EEPROM, like the [Qwiic NFCPROM](https://hackaday.io/project/160582-qwiic-nfcprom), [Blinking Business-card Badge](https://hackaday.io/project/160590-blinking-business-card-badge-b3), or [Teardown2019 Badge](https://upverter.com/design/gsteiert/teardown2019/).  This example demonstrates how to manage a headless embedded WiFi web server with a phone through NFC. 
 
 ## Features
  - Set WiFi SSID and Password 
