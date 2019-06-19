@@ -10,7 +10,7 @@ NFC EEPROM Example for boards based on the ST25DV series of dual port NFC/I2C EE
  - ST25DV based board with I2C connector (Qwiic NFCPROM)
  - Phone with ST25 Android App
  - Arduino enabled ESP32 board (Feather Huzzah32) 
- - Adapter/cable to connect boards (QwiiKit)
+ - Adapter/cable to connect boards ([QwiiKit](https://www.crowdsupply.com/steiert-solutions/qwiikit))
 
 ## Instructions
 1. Load SSID into ST25DV memory starting at address 0x00C0 using ST25 Android app
