@@ -5,6 +5,13 @@
 #include <WebServer.h>
 #include <ESPmDNS.h>
 
+//#define DEBUG
+#ifdef DEBUG
+ #define DEBUG_PRINT(x)  Serial.println (x)
+#else
+ #define DEBUG_PRINT(x)
+#endif
+
 int logs = 0;
 
 WebServer server(80);
@@ -76,9 +83,12 @@ void setup(void) {
   Wire.begin();
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
-  Serial.begin(115200);
 
-  Serial.println("");
+#ifdef DEBUG
+  Serial.begin(115200);
+#endif
+
+  DEBUG_PRINT("");
   logClr();
 
   String ssid = "";
@@ -89,22 +99,22 @@ void setup(void) {
   Wire.write(byte(0xC0));
   Wire.endTransmission(false);
   Wire.requestFrom(nfcprom, 32);
-  Serial.print("SSID:  ");
+  DEBUG_PRINT("SSID:  ");
   while(Wire.available()) {
     ssid += (char)Wire.read();
   }
-  Serial.println(ssid);
+  DEBUG_PRINT(ssid);
 
   Wire.beginTransmission(nfcprom);
   Wire.write(byte(0x00));
   Wire.write(byte(0xE0));
   Wire.endTransmission(false);
   Wire.requestFrom(nfcprom, 32);
-  Serial.print("PWD:  ");
+  DEBUG_PRINT("PWD:  ");
   while(Wire.available()) {
     password += (char)Wire.read();
   }
-  Serial.println(password);
+  DEBUG_PRINT(password);
 
   
   WiFi.mode(WIFI_STA);
@@ -114,19 +124,17 @@ void setup(void) {
   int trys = 0;
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
     trys +=1;
   }
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
-  Serial.print("IP address: ");
+  DEBUG_PRINT("Connected to ");
+  DEBUG_PRINT(ssid);
+  DEBUG_PRINT("IP address: ");
   IPAddress myIP = WiFi.localIP();
   String IPString = String(myIP[0])+
             "."+String(myIP[1])+
             "."+String(myIP[2])+
             "."+String(myIP[3]);
-  Serial.println(IPString);
+  DEBUG_PRINT(IPString);
   char msgBuf[16];
   IPString.toCharArray(msgBuf, 16);
   logMsg(msgBuf);
@@ -134,7 +142,7 @@ void setup(void) {
   logMsg(msgBuf);
 
   if(ret != NDEF_OK)
-    Serial.println("Error initializing NFCTAG");
+    DEBUG_PRINT("Error initializing NFCTAG");
   sURI_Info myURI;
   strcpy( myURI.protocol,URI_ID_0x03_STRING );
   strcpy( myURI.URI_Message,IPString.c_str() );
@@ -145,7 +153,7 @@ void setup(void) {
   writeMsg(ndefBuf, ndefSize);
 
   if (MDNS.begin("esp32")) {
-    Serial.println("MDNS responder started");
+    DEBUG_PRINT("MDNS responder started");
   }
 
   server.on("/", handleRoot);
@@ -163,7 +171,7 @@ void setup(void) {
   server.onNotFound(handleNotFound);
 
   server.begin();
-  Serial.println("HTTP server started");
+  DEBUG_PRINT("HTTP server started");
 }
 
 void loop(void) {
